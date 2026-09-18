@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "nombre": "La Payunia — Reserva Volcánica",
+    "descripcion": "Exploración de la reserva volcánica más grande del mundo, con más de 800 conos volcánicos en el sur mendocino.",
+    "duracion_horas": 12,
+    "precio_por_persona": 124000,
+    "incluye_almuerzo": true,
+    "incluye_guia": true,
+    "dificultad": "moderada",
+    "disponible": true,
+    "imagen": "payunia.jpg"
+  },
+  {
+    "id": 2,
+    "nombre": "Astroturismo — Una noche de estrellas",
+    "descripcion": "Observación astronómica con telescopios profesionales a 8 km de la cordillera, lejos de la contaminación lumínica.",
+    "duracion_horas": 3,
+    "precio_por_persona": 25000,
+    "incluye_almuerzo": false,
+    "incluye_guia": true,
+    "dificultad": "baja",
+    "disponible": true,
+    "imagen": "astroturismo.jpg"
+  },
+  {
+    "id": 3,
+    "nombre": "Volcán Malacara — Trekking Volcánico",
+    "descripcion": "Recorrido por cárcavas volcánicas únicas con visita a la Antena ESA y degustación de vinos regionales al final.",
+    "duracion_horas": 6,
+    "precio_por_persona": 50000,
+    "incluye_almuerzo": false,
+    "incluye_guia": true,
+    "dificultad": "moderada",
+    "disponible": true,
+    "imagen": "malacara.jpg"
+  },
+  {
+    "id": 4,
+    "nombre": "Caverna de las Brujas",
+    "descripcion": "Exploración espeleológica profesional con clase previa, cascos e iluminación especializada.",
+    "duracion_horas": 6,
+    "precio_por_persona": 50000,
+    "incluye_almuerzo": false,
+    "incluye_guia": true,
+    "dificultad": "alta",
+    "disponible": true,
+    "imagen": "caverna.jpg"
+  },
+  {
+    "id": 5,
+    "nombre": "Las Leñas — Transporte Ski",
+    "descripcion": "Traslado ida y vuelta al centro de esquí Las Leñas con horarios flexibles, seguro incluido y coordinador a bordo.",
+    "duracion_horas": 8,
+    "precio_por_persona": 50000,
+    "incluye_almuerzo": false,
+    "incluye_guia": false,
+    "dificultad": "baja",
+    "disponible": false,
+    "imagen": "laslenhas.jpg"
+  },
+  {
+    "id": 6,
+    "nombre": "Tiro con Arco",
+    "descripcion": "Experiencia al aire libre para principiantes en grupos reducidos, con todo el equipamiento incluido.",
+    "duracion_horas": 2,
+    "precio_por_persona": 15000,
+    "incluye_almuerzo": false,
+    "incluye_guia": true,
+    "dificultad": "baja",
+    "disponible": true,
+    "imagen": "tiro-arco.jpg"
+  }
+]

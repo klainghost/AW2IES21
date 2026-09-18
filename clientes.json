@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "nombre": "Sofía",
+    "apellido": "Bernal",
+    "email": "sofia.bernal@gmail.com",
+    "telefono": "+54 9 261 445-7823",
+    "edad": 32,
+    "ciudad": "Mendoza",
+    "activo": true,
+    "fecha_registro": "2025-06-10"
+  },
+  {
+    "id": 2,
+    "nombre": "Lucas",
+    "apellido": "Herrera",
+    "email": "lucasherrera@hotmail.com",
+    "telefono": "+54 9 11 5022-3344",
+    "edad": 27,
+    "ciudad": "Buenos Aires",
+    "activo": true,
+    "fecha_registro": "2025-07-02"
+  },
+  {
+    "id": 3,
+    "nombre": "Ana",
+    "apellido": "Martínez",
+    "email": "ana.martinez@yahoo.com",
+    "telefono": "+54 9 351 678-9001",
+    "edad": 45,
+    "ciudad": "Córdoba",
+    "activo": false,
+    "fecha_registro": "2025-05-18"
+  },
+  {
+    "id": 4,
+    "nombre": "Tomás",
+    "apellido": "Quiroga",
+    "email": "tomas.quiroga@gmail.com",
+    "telefono": "+54 9 2604 55-1122",
+    "edad": 38,
+    "ciudad": "Malargüe",
+    "activo": true,
+    "fecha_registro": "2025-08-01"
+  },
+  {
+    "id": 5,
+    "nombre": "Florencia",
+    "apellido": "Salinas",
+    "email": "florsalinas@gmail.com",
+    "telefono": "+54 9 299 433-6677",
+    "edad": 29,
+    "ciudad": "Neuquén",
+    "activo": true,
+    "fecha_registro": "2025-08-15"
+  }
+]

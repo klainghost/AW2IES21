@@ -1,0 +1,64 @@
+[
+  {
+    "id": 1,
+    "id_cliente": 1,
+    "fecha_reserva": "2025-08-20",
+    "fecha_excursion": "2025-09-06",
+    "cantidad_personas": 2,
+    "pagado": true,
+    "total": 280000,
+    "excursiones": [
+      { "id_excursion": 1, "cantidad_personas": 2 }
+    ]
+  },
+  {
+    "id": 2,
+    "id_cliente": 2,
+    "fecha_reserva": "2025-08-25",
+    "fecha_excursion": "2025-09-10",
+    "cantidad_personas": 1,
+    "pagado": false,
+    "total": 32000,
+    "excursiones": [
+      { "id_excursion": 2, "cantidad_personas": 1 },
+      { "id_excursion": 6, "cantidad_personas": 1 }
+    ]
+  },
+  {
+    "id": 3,
+    "id_cliente": 4,
+    "fecha_reserva": "2025-09-01",
+    "fecha_excursion": "2025-09-15",
+    "cantidad_personas": 3,
+    "pagado": true,
+    "total": 66000,
+    "excursiones": [
+      { "id_excursion": 3, "cantidad_personas": 3 }
+    ]
+  },
+  {
+    "id": 4,
+    "id_cliente": 5,
+    "fecha_reserva": "2025-09-05",
+    "fecha_excursion": "2025-09-20",
+    "cantidad_personas": 2,
+    "pagado": true,
+    "total": 44000,
+    "excursiones": [
+      { "id_excursion": 4, "cantidad_personas": 2 }
+    ]
+  },
+  {
+    "id": 5,
+    "id_cliente": 1,
+    "fecha_reserva": "2025-09-08",
+    "fecha_excursion": "2025-10-03",
+    "cantidad_personas": 4,
+    "pagado": false,
+    "total": 120000,
+    "excursiones": [
+      { "id_excursion": 1, "cantidad_personas": 2 },
+      { "id_excursion": 2, "cantidad_personas": 2 }
+    ]
+  }
+]
