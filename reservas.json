@@ -6,7 +6,7 @@
     "fecha_excursion": "2025-09-06",
     "cantidad_personas": 2,
     "pagado": true,
-    "total": 280000,
+    "total": 248000,
     "excursiones": [
       { "id_excursion": 1, "cantidad_personas": 2 }
     ]
@@ -18,7 +18,7 @@
     "fecha_excursion": "2025-09-10",
     "cantidad_personas": 1,
     "pagado": false,
-    "total": 32000,
+    "total": 40000,
     "excursiones": [
       { "id_excursion": 2, "cantidad_personas": 1 },
       { "id_excursion": 6, "cantidad_personas": 1 }
@@ -31,7 +31,7 @@
     "fecha_excursion": "2025-09-15",
     "cantidad_personas": 3,
     "pagado": true,
-    "total": 66000,
+    "total": 150000,
     "excursiones": [
       { "id_excursion": 3, "cantidad_personas": 3 }
     ]
@@ -43,11 +43,12 @@
     "fecha_excursion": "2025-09-20",
     "cantidad_personas": 2,
     "pagado": true,
-    "total": 44000,
+    "total": 100000,
     "excursiones": [
       { "id_excursion": 4, "cantidad_personas": 2 }
     ]
   },
+  
   {
     "id": 5,
     "id_cliente": 1,
@@ -55,7 +56,7 @@
     "fecha_excursion": "2025-10-03",
     "cantidad_personas": 4,
     "pagado": false,
-    "total": 120000,
+    "total": 298000,
     "excursiones": [
       { "id_excursion": 1, "cantidad_personas": 2 },
       { "id_excursion": 2, "cantidad_personas": 2 }
