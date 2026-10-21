@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
 
 import clientesRouter from './routes/clientes.routes.js'
 import excursionesRouter from './routes/excursiones.routes.js'
@@ -14,6 +15,8 @@ const app = express()
 // Configuración del puerto
 const port = process.env.PORT
 
+// El front (Astro) corre en otro puerto → hay que habilitar CORS
+app.use(cors())
 app.use(express.json())
 
 app.listen(port, () => {

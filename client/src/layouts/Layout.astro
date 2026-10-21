@@ -1,0 +1,49 @@
+---
+import '../styles/global.css'
+import Navbar from '../components/Navbar.astro'
+import EstrellaFugaz from '../components/EstrellaFugaz.astro'
+
+interface Props {
+    title: string
+    protegida?: boolean // si es true, solo se puede entrar con sesión iniciada
+}
+
+const { title, protegida = true } = Astro.props
+---
+
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/png" href="/logo-icon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+        <title>{title} · Astroturismo</title>
+    </head>
+    <body class="cielo min-h-screen font-sans text-luna" data-protegida={protegida ? 'true' : 'false'}>
+        {protegida && <Navbar />}
+
+        <main class="relative z-10 mx-auto w-full max-w-6xl px-4 pt-6 pb-32 md:pt-10 md:pb-48">
+            <slot />
+        </main>
+
+        <!-- Montañas de fondo -->
+        <svg class="montanas w-full" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+            <path fill="#10241f" d="M0 200V120l120-50 110 60 150-90 140 80 120-40 160 70 170-100 150 80 130-50 190 70v80z" />
+            <path fill="#0a1a16" d="M0 200v-50l160-30 140 40 180-60 150 50 200-40 170 50 180-45 260 45v40z" />
+        </svg>
+
+        <EstrellaFugaz />
+
+        <script>
+            import { getSession } from '../scripts/utils/session.js'
+
+            // Guardia de sesión: sin usuario, vuelve al login
+            if (document.body.dataset.protegida === 'true' && !getSession()) {
+                window.location.href = '/'
+            }
+        </script>
+    </body>
+</html>

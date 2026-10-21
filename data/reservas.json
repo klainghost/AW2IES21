@@ -8,7 +8,10 @@
     "pagado": true,
     "total": 248000,
     "excursiones": [
-      { "id_excursion": 1, "cantidad_personas": 2 }
+      {
+        "id_excursion": 1,
+        "cantidad_personas": 2
+      }
     ]
   },
   {
@@ -20,8 +23,14 @@
     "pagado": false,
     "total": 40000,
     "excursiones": [
-      { "id_excursion": 2, "cantidad_personas": 1 },
-      { "id_excursion": 6, "cantidad_personas": 1 }
+      {
+        "id_excursion": 2,
+        "cantidad_personas": 1
+      },
+      {
+        "id_excursion": 6,
+        "cantidad_personas": 1
+      }
     ]
   },
   {
@@ -33,7 +42,10 @@
     "pagado": true,
     "total": 150000,
     "excursiones": [
-      { "id_excursion": 3, "cantidad_personas": 3 }
+      {
+        "id_excursion": 3,
+        "cantidad_personas": 3
+      }
     ]
   },
   {
@@ -45,10 +57,12 @@
     "pagado": true,
     "total": 100000,
     "excursiones": [
-      { "id_excursion": 4, "cantidad_personas": 2 }
+      {
+        "id_excursion": 4,
+        "cantidad_personas": 2
+      }
     ]
   },
-  
   {
     "id": 5,
     "id_cliente": 1,
@@ -58,8 +72,37 @@
     "pagado": false,
     "total": 298000,
     "excursiones": [
-      { "id_excursion": 1, "cantidad_personas": 2 },
-      { "id_excursion": 2, "cantidad_personas": 2 }
+      {
+        "id_excursion": 1,
+        "cantidad_personas": 2
+      },
+      {
+        "id_excursion": 2,
+        "cantidad_personas": 2
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "id_cliente": 1,
+    "fecha_reserva": "2026-10-20",
+    "fecha_excursion": "2019-02-10",
+    "cantidad_personas": 1,
+    "pagado": false,
+    "total": 199000,
+    "excursiones": [
+      {
+        "id_excursion": 1,
+        "cantidad_personas": 1
+      },
+      {
+        "id_excursion": 2,
+        "cantidad_personas": 1
+      },
+      {
+        "id_excursion": 3,
+        "cantidad_personas": 1
+      }
     ]
   }
 ]

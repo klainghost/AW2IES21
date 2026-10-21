@@ -1,0 +1,65 @@
+---
+const links = [
+    { href: '/excursiones', texto: 'Excursiones' },
+    { href: '/filtrar', texto: 'Filtrar' },
+    { href: '/carrito', texto: 'Carrito' }
+]
+
+const actual = Astro.url.pathname.replace(/\/$/, '')
+---
+
+<header class="relative z-20 border-b border-noche-700/60 bg-noche-950/70 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <a href="/excursiones" class="flex items-center gap-2">
+            <img src="/logo-icon.png" alt="" class="h-10 w-10" />
+            <span class="text-lg font-extrabold tracking-wider">ASTRO<span class="text-atardecer">TURISMO</span></span>
+        </a>
+
+        <div class="flex items-center gap-3 md:order-last">
+            <span id="navUsuario" class="hidden text-sm text-niebla sm:inline"></span>
+            <button id="btnSalir" class="btn-secundario py-1.5">Salir</button>
+        </div>
+
+        <!-- En mobile los links van en una fila abajo; desde md quedan en el medio -->
+        <ul class="flex w-full justify-around text-sm font-semibold md:w-auto md:gap-8">
+            {links.map(link => (
+                <li>
+                    <a
+                        href={link.href}
+                        class:list={[
+                            'flex items-center gap-1.5 py-1 transition hover:text-estrella',
+                            actual === link.href ? 'text-estrella' : 'text-niebla'
+                        ]}
+                    >
+                        {link.texto}
+                        {link.href === '/carrito' && (
+                            <span id="navCantidad" class="rounded-full bg-atardecer px-2 text-xs font-bold text-noche-950">0</span>
+                        )}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </nav>
+</header>
+
+<script>
+    import { getSession, removeSession } from '../scripts/utils/session.js'
+    import { cantidadTotal } from '../scripts/utils/carrito.js'
+
+    const user = getSession()
+    const navUsuario = document.getElementById('navUsuario')
+    const navCantidad = document.getElementById('navCantidad')
+
+    if (user) navUsuario.textContent = `Hola, ${user.nombre}`
+
+    const actualizarCantidad = () => {
+        navCantidad.textContent = cantidadTotal()
+    }
+    actualizarCantidad()
+    window.addEventListener('carrito-actualizado', actualizarCantidad)
+
+    document.getElementById('btnSalir').addEventListener('click', () => {
+        removeSession()
+        window.location.href = '/'
+    })
+</script>

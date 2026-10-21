@@ -1,5 +1,6 @@
 **IES 21** – Aplicaciones Web 2
 Entrega TP2 – Servidor Express y enrutamiento
+Entrega TP3 – Front-end con Astro (ver [TP3 – Front-end](#tp3--front-end-astroturismo))
 Moya Cristian Gabriel
 
 # API de Excursiones
@@ -115,3 +116,61 @@ Capturas en la carpeta [`capturas-postman/`](capturas-postman/):
 | `400` | Datos inválidos o la operación rompería la integridad de los datos |
 | `404` | No se encontró el registro |
 | `500` | Error del servidor (por ejemplo, al escribir el archivo) |
+
+---
+
+# TP3 – Front-end (Astroturismo)
+
+Interfaz hecha con **[Astro](https://astro.build/)** + **Tailwind CSS**, dentro de la carpeta `client/` (**monorepo**: front y back en el mismo repositorio). Tema oscuro con paleta de naturaleza nocturna y diseño *mobile first*.
+
+## Cómo ejecutarlo
+
+Se levantan **dos servidores**, cada uno en su terminal:
+
+```bash
+# 1) Back-end (desde la raíz) → http://localhost:3000
+npm install
+npm run dev
+
+# 2) Front-end (desde client/) → http://localhost:4321
+cd client
+npm install
+npm run dev
+```
+
+Como el front corre en otro puerto, el back usa `cors()`.
+
+Para probar, ingresar con el email `sofia.bernal@gmail.com`.
+
+## Vistas
+
+| Ruta | Qué hace |
+|---|---|
+| `/` | Ingreso con email (`POST /clientes/byEmail`). El cliente se guarda en **sessionStorage** |
+| `/excursiones` | Listado de todas las excursiones (`GET /excursiones/all`) y botón para agregarlas al carrito |
+| `/filtrar` | Filtra las excursiones por dificultad (`GET /excursiones/byDificultad/:dificultad`) |
+| `/carrito` | Carrito guardado en **localStorage**: sumar/restar personas, quitar, vaciar y **comprar** |
+
+Al **comprar** se genera una orden de compra = una **reserva** (`POST /reservas`) con el cliente logueado y las excursiones del carrito. El back valida los datos y calcula el total. Si sale bien, pasa una estrella fugaz y se muestra la confirmación.
+
+## Estructura del front
+
+```
+client/
+├── public/                     ← logo
+└── src/
+    ├── layouts/Layout.astro    ← HTML base, fondo estrellado, guardia de sesión
+    ├── components/             ← Navbar.astro, EstrellaFugaz.astro
+    ├── pages/                  ← index, excursiones, filtrar, carrito
+    ├── styles/global.css       ← Tailwind + paleta de colores
+    └── scripts/
+        ├── api/                ← fetch al back (config, clientes, excursiones, reservas)
+        ├── components/         ← card de excursión, lista, aviso
+        └── utils/              ← sessionStorage, carrito (localStorage), formato, estrella fugaz
+```
+
+## Ruta nueva en el back
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/excursiones/byDificultad/:dificultad` | Excursiones de una dificultad (`baja`, `moderada`, `alta`) |

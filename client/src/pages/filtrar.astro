@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const filtros = [
+    { valor: 'baja', texto: 'Baja' },
+    { valor: 'moderada', texto: 'Moderada' },
+    { valor: 'alta', texto: 'Alta' }
+]
+---
+
+<Layout title="Filtrar">
+    <section class="mb-6 flex flex-col gap-1">
+        <h1 class="text-2xl font-extrabold md:text-3xl">Filtrar por dificultad</h1>
+        <p class="text-niebla">¿Paseo tranquilo o aventura exigente? Vos elegís.</p>
+    </section>
+
+    <div id="filtros" class="mb-8 flex flex-wrap gap-3">
+        {filtros.map(filtro => (
+            <button data-dificultad={filtro.valor} aria-pressed="false" class="btn-secundario aria-pressed:border-estrella aria-pressed:bg-estrella aria-pressed:text-noche-950">
+                {filtro.texto}
+            </button>
+        ))}
+    </div>
+
+    <div id="listaExcursiones" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <p class="text-niebla">Elegí una dificultad para ver las excursiones.</p>
+    </div>
+
+    <script>
+        import { getExcursionesByDificultad } from '../scripts/api/excursiones.js'
+        import { renderExcursiones, escucharAgregar } from '../scripts/components/listaExcursiones.js'
+
+        const filtros = document.getElementById('filtros')
+        const contenedor = document.getElementById('listaExcursiones')
+        let excursiones = []
+
+        escucharAgregar(contenedor, () => excursiones)
+
+        filtros.addEventListener('click', async (e) => {
+            const boton = e.target.closest('button[data-dificultad]')
+            if (!boton) return
+
+            const dificultad = boton.dataset.dificultad
+            filtros.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === boton)))
+            contenedor.innerHTML = '<p class="text-niebla">Buscando...</p>'
+
+            try {
+                const { ok, status, data } = await getExcursionesByDificultad(dificultad)
+
+                if (ok) {
+                    excursiones = data
+                    renderExcursiones(contenedor, excursiones)
+                } else if (status === 404) {
+                    excursiones = []
+                    contenedor.innerHTML = `<p class="text-niebla">No hay excursiones de dificultad ${dificultad}.</p>`
+                } else {
+                    throw new Error(data)
+                }
+            } catch (error) {
+                console.error(error)
+                contenedor.innerHTML = '<p class="text-atardecer">No se pudieron cargar las excursiones.</p>'
+            }
+        })
+    </script>
+</Layout>

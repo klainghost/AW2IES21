@@ -36,6 +36,18 @@ router.get('/disponibles', (req, res) => {
     }
 })
 
+// Excursiones por dificultad (baja, moderada, alta)
+router.get('/byDificultad/:dificultad', (req, res) => {
+    const dificultad = req.params.dificultad.toLowerCase()
+    const result = excursionesData.filter(e => e.dificultad === dificultad)
+
+    if (result.length > 0) {
+        res.status(200).json(result)
+    } else {
+        res.status(404).json(`No hay excursiones de dificultad ${dificultad}`)
+    }
+})
+
 /* ========== POST ========== */
 
 // Crear una excursión nueva

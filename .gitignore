@@ -9,3 +9,7 @@ package-lock.json
 
 # Práctica de clase (no es parte del TP)
 Express/
+
+# Archivos generados por Astro (client/)
+client/dist/
+client/.astro/

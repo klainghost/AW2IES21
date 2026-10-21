@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* Paleta "naturaleza nocturna" */
+@theme {
+    --color-noche-950: #070d1a;
+    --color-noche-900: #0b1426;
+    --color-noche-800: #13203a;
+    --color-noche-700: #1f3152;
+    --color-bosque: #2f6b57;
+    --color-bosque-claro: #5fb894;
+    --color-luna: #e8eef7;
+    --color-niebla: #9fb0c9;
+    --color-estrella: #f5d77a;
+    --color-atardecer: #f6863b;
+
+    --font-sans: "Nunito", system-ui, sans-serif;
+}
+
+:root {
+    color-scheme: dark;
+}
+
+@layer components {
+    .btn-primario {
+        @apply rounded-xl bg-atardecer px-4 py-2 text-sm font-bold text-noche-950 transition hover:bg-estrella disabled:cursor-not-allowed disabled:opacity-50;
+    }
+    .btn-secundario {
+        @apply rounded-xl border border-noche-700 px-4 py-2 text-sm font-semibold text-luna transition hover:border-estrella hover:text-estrella;
+    }
+    .input {
+        @apply rounded-xl border border-noche-700 bg-noche-950/60 px-3 py-2.5 text-luna placeholder:text-niebla/60 focus:border-estrella focus:outline-none;
+    }
+}
+
+/* ===== Cielo estrellado de fondo ===== */
+.cielo {
+    background-color: var(--color-noche-950);
+    background-image: radial-gradient(ellipse 120% 70% at 50% 0%, #16264a 0%, transparent 65%);
+    background-attachment: fixed;
+}
+
+.cielo::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        radial-gradient(1.5px 1.5px at 25px 35px, rgb(255 255 255 / 0.8), transparent),
+        radial-gradient(1px 1px at 120px 80px, rgb(255 255 255 / 0.6), transparent),
+        radial-gradient(1.5px 1.5px at 170px 150px, rgb(245 215 122 / 0.8), transparent),
+        radial-gradient(1px 1px at 60px 180px, rgb(255 255 255 / 0.5), transparent),
+        radial-gradient(1px 1px at 210px 20px, rgb(255 255 255 / 0.7), transparent);
+    background-size: 230px 230px;
+    animation: titilar 6s ease-in-out infinite alternate;
+}
+
+@keyframes titilar {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+}
+
+/* Montañas al pie de la página */
+.montanas {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 0;
+    height: 110px;
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    .montanas { height: 170px; }
+}
+
+/* ===== Estrella fugaz (al confirmar una compra) ===== */
+.estrella-capa {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.estrella-capa.activa {
+    display: block;
+}
+
+.estrella {
+    position: absolute;
+    top: 8%;
+    left: 100%;
+    width: 220px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #fff, rgb(245 215 122 / 0.7) 25%, transparent);
+}
+
+/* La "cabeza" brillante de la estrella */
+.estrella::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 14px 5px rgb(245 215 122 / 0.9);
+    transform: translateY(-50%);
+}
+
+.estrella-capa.activa .estrella {
+    animation: fugaz 1.4s ease-in forwards;
+}
+
+@keyframes fugaz {
+    0%   { transform: translate(0, 0) rotate(-28deg); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translate(-125vw, 65vh) rotate(-28deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cielo::before { animation: none; }
+    .estrella-capa.activa .estrella { animation: none; display: none; }
+}

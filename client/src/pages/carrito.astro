@@ -1,0 +1,159 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Carrito">
+    <section class="mb-6 flex flex-col gap-1">
+        <h1 class="text-2xl font-extrabold md:text-3xl">Tu carrito</h1>
+        <p class="text-niebla">La cantidad es la cantidad de personas para cada excursión.</p>
+    </section>
+
+    <div class="grid gap-6 md:grid-cols-3">
+        <ul id="itemsCarrito" class="flex flex-col gap-4 md:col-span-2"></ul>
+
+        <aside class="flex h-fit flex-col gap-4 rounded-2xl border border-noche-700 bg-noche-800/70 p-5 backdrop-blur-sm">
+            <h2 class="text-lg font-extrabold">Resumen</h2>
+
+            <label class="flex flex-col gap-1 text-sm font-semibold">
+                Fecha de la excursión
+                <input id="fechaExcursion" type="date" class="input" />
+            </label>
+
+            <div class="flex items-center justify-between border-t border-noche-700 pt-4">
+                <span class="text-niebla">Total</span>
+                <span id="totalCarrito" class="text-2xl font-extrabold text-estrella">$ 0</span>
+            </div>
+
+            <button id="btnComprar" class="btn-primario w-full py-3">Comprar</button>
+            <button id="btnVaciar" class="btn-secundario w-full">Vaciar carrito</button>
+        </aside>
+    </div>
+
+    <!-- Confirmación de la compra -->
+    <dialog id="dlgReserva" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-estrella/40 bg-noche-900 p-6 text-luna backdrop:bg-noche-950/70">
+        <div class="flex flex-col items-center gap-4 text-center">
+            <img src="/logo-icon.png" alt="" class="h-16 w-16" />
+            <h2 class="text-xl font-extrabold">¡Reserva confirmada!</h2>
+            <p id="dlgTexto" class="text-sm text-niebla"></p>
+            <a href="/excursiones" class="btn-primario">Seguir explorando</a>
+        </div>
+    </dialog>
+
+    <script>
+        import { getSession } from '../scripts/utils/session.js'
+        import { getCarrito, cambiarCantidad, quitarDelCarrito, vaciarCarrito, totalCarrito } from '../scripts/utils/carrito.js'
+        import { crearReserva } from '../scripts/api/reservas.js'
+        import { mostrarAviso } from '../scripts/components/aviso.js'
+        import { lanzarEstrellaFugaz } from '../scripts/utils/estrellaFugaz.js'
+        import { formatoPrecio, formatoFecha, fechaISO } from '../scripts/utils/formato.js'
+
+        const user = getSession()
+        const itemsCarrito = document.getElementById('itemsCarrito')
+        const totalEl = document.getElementById('totalCarrito')
+        const fechaExcursion = document.getElementById('fechaExcursion')
+        const btnComprar = document.getElementById('btnComprar')
+        const btnVaciar = document.getElementById('btnVaciar')
+        const dlgReserva = document.getElementById('dlgReserva')
+
+        // La excursión tiene que ser desde mañana
+        fechaExcursion.min = fechaISO(1)
+
+        const renderCarrito = () => {
+            const carrito = getCarrito()
+
+            if (carrito.length === 0) {
+                itemsCarrito.innerHTML = `
+                    <li class="rounded-2xl border border-dashed border-noche-700 p-8 text-center text-niebla">
+                        Tu carrito está vacío. <a href="/excursiones" class="font-bold text-estrella hover:underline">Ver excursiones</a>
+                    </li>`
+            } else {
+                itemsCarrito.innerHTML = carrito.map(item => `
+                    <li class="flex flex-col gap-3 rounded-2xl border border-noche-700 bg-noche-800/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="font-bold">${item.nombre}</p>
+                            <p class="text-sm text-niebla">${formatoPrecio(item.precio)} / persona</p>
+                        </div>
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-2">
+                                <button name="btnMenos" data-id="${item.id}" class="btn-secundario px-3 py-1" aria-label="Quitar una persona">−</button>
+                                <span class="w-6 text-center font-bold">${item.cantidad}</span>
+                                <button name="btnMas" data-id="${item.id}" class="btn-secundario px-3 py-1" aria-label="Agregar una persona">+</button>
+                            </div>
+                            <span class="w-28 text-right font-extrabold text-estrella">${formatoPrecio(item.precio * item.cantidad)}</span>
+                            <button name="btnQuitar" data-id="${item.id}" class="text-sm text-niebla hover:text-atardecer">Quitar</button>
+                        </div>
+                    </li>`).join('')
+            }
+
+            totalEl.textContent = formatoPrecio(totalCarrito())
+            btnComprar.disabled = carrito.length === 0
+            btnVaciar.disabled = carrito.length === 0
+        }
+
+        // Delegación de eventos para los botones de cada item
+        itemsCarrito.addEventListener('click', (e) => {
+            const boton = e.target.closest('button[data-id]')
+            if (!boton) return
+            const id = Number(boton.dataset.id)
+
+            if (boton.name === 'btnMas') cambiarCantidad(id, 1)
+            else if (boton.name === 'btnMenos') cambiarCantidad(id, -1)
+            else if (boton.name === 'btnQuitar') quitarDelCarrito(id)
+            renderCarrito()
+        })
+
+        btnVaciar.addEventListener('click', () => {
+            vaciarCarrito()
+            renderCarrito()
+        })
+
+        btnComprar.addEventListener('click', async () => {
+            const carrito = getCarrito()
+            if (carrito.length === 0) return
+
+            if (fechaExcursion.value === '') {
+                mostrarAviso('Elegí la fecha de la excursión', 'error')
+                fechaExcursion.focus()
+                return
+            }
+
+            // La orden de compra = una reserva en el back
+            const reserva = {
+                id_cliente: user.id,
+                fecha_reserva: fechaISO(0),
+                fecha_excursion: fechaExcursion.value,
+                cantidad_personas: Math.max(...carrito.map(item => item.cantidad)),
+                excursiones: carrito.map(item => ({ id_excursion: item.id, cantidad_personas: item.cantidad }))
+            }
+
+            btnComprar.disabled = true
+            btnComprar.textContent = 'Reservando...'
+            try {
+                const { ok, data } = await crearReserva(reserva)
+
+                if (!ok) {
+                    mostrarAviso(typeof data === 'string' ? data : 'No se pudo crear la reserva', 'error')
+                    return
+                }
+
+                vaciarCarrito()
+                renderCarrito()
+                fechaExcursion.value = ''
+
+                // ⭐ Primero pasa la estrella fugaz y después se muestra la confirmación
+                lanzarEstrellaFugaz()
+                document.getElementById('dlgTexto').textContent =
+                    `${data.cliente}, tu reserva #${data.id} para el ${formatoFecha(data.fecha_excursion)} quedó registrada. Total: ${formatoPrecio(data.total)}.`
+                setTimeout(() => dlgReserva.showModal(), 1300)
+            } catch (error) {
+                console.error(error)
+                mostrarAviso('No se pudo conectar con el servidor', 'error')
+            } finally {
+                btnComprar.textContent = 'Comprar'
+                btnComprar.disabled = getCarrito().length === 0
+            }
+        })
+
+        renderCarrito()
+    </script>
+</Layout>

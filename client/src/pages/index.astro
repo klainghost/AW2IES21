@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Ingresar" protegida={false}>
+    <section class="mx-auto flex max-w-sm flex-col items-center gap-6 md:pt-6">
+        <img src="/logo.png" alt="Astroturismo Malargüe" class="w-52 md:w-64" />
+
+        <form id="formLogin" class="flex w-full flex-col gap-4 rounded-2xl border border-noche-700 bg-noche-800/70 p-6 backdrop-blur-sm">
+            <h1 class="text-center text-xl font-extrabold">¡Hola, viajero/a!</h1>
+            <p class="text-center text-sm text-niebla">
+                Ingresá con tu email para reservar tu próxima noche bajo las estrellas.
+            </p>
+
+            <label class="flex flex-col gap-1 text-sm font-semibold">
+                Email
+                <input id="txtEmail" type="email" class="input" placeholder="tu@email.com" autocomplete="email" />
+            </label>
+
+            <button type="submit" id="btnLogin" class="btn-primario w-full py-3">Ingresar</button>
+
+            <p id="msgLogin" class="min-h-5 text-center text-sm text-atardecer" role="alert"></p>
+            <p class="text-center text-xs text-niebla">Para probar: sofia.bernal@gmail.com</p>
+        </form>
+    </section>
+
+    <script>
+        import { getClienteByEmail } from '../scripts/api/clientes.js'
+        import { getSession, setSession } from '../scripts/utils/session.js'
+
+        // Si ya hay sesión, va directo a las excursiones
+        if (getSession()) window.location.href = '/excursiones'
+
+        const formLogin = document.getElementById('formLogin')
+        const msgLogin = document.getElementById('msgLogin')
+        const btnLogin = document.getElementById('btnLogin')
+
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('txtEmail').value.trim()
+
+            if (email === '') {
+                msgLogin.textContent = 'Ingresá tu email'
+                return
+            }
+
+            btnLogin.disabled = true
+            msgLogin.textContent = ''
+            try {
+                const { ok, data } = await getClienteByEmail(email)
+
+                if (!ok) {
+                    msgLogin.textContent = 'No encontramos ningún cliente con ese email'
+                } else if (!data.activo) {
+                    msgLogin.textContent = 'Tu cuenta está inactiva, no podés hacer reservas'
+                } else {
+                    setSession({ id: data.id, nombre: data.nombre, apellido: data.apellido, email: data.email })
+                    window.location.href = '/excursiones'
+                }
+            } catch (error) {
+                console.error(error)
+                msgLogin.textContent = 'No se pudo conectar con el servidor (¿está levantado en el puerto 3000?)'
+            } finally {
+                btnLogin.disabled = false
+            }
+        })
+    </script>
+</Layout>
