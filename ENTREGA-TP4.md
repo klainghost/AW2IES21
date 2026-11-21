@@ -6,7 +6,7 @@ Moya Cristian Gabriel
 
 ## Links
 - **Repositorio:** https://github.com/klainghost/AW2IES21/tree/TP4
-- **Video explicativo:** 
+- **Video explicativo:**  https://youtu.be/NAkYEk3v-KE
 - **Deploy:**el proyecto se ejecuta en local
 
 ---
