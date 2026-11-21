@@ -1,50 +1,74 @@
 import { Router } from 'express'
-import { readFile, writeFile } from 'fs/promises'
+import mongoose from 'mongoose'
+import {
+    findAll, findById, findDisponibles, findByDificultad, findByPrecio,
+    create, updatePrecio, countReservas, deleteById
+} from '../db/actions/excursion.actions.js'
 
 const router = Router()
 
-const fileExcursiones = await readFile('./data/excursiones.json', 'utf-8')
-let excursionesData = JSON.parse(fileExcursiones)
+// La ruta no habla con Mongo: lee el request, llama a una action y responde
 
 /* ========== GET ========== */
 
 // Todas las excursiones
-router.get('/all', (req, res) => {
-    res.status(200).json(excursionesData)
+router.get('/all', async (req, res) => {
+    try {
+        const result = await findAll()
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json('Error al obtener las excursiones')
+    }
 })
 
 // Una excursión por id
-router.get('/byId/:id', (req, res) => {
-    const id = parseInt(req.params.id)
-    const result = excursionesData.find(e => e.id === id)
+router.get('/byId/:id', async (req, res) => {
+    const id = req.params.id
 
-    if (result) {
-        res.status(200).json(result)
-    } else {
-        res.status(404).json(`La excursión ${id} no se encuentra`)
+    // Si no tiene formato de ObjectId, Mongo tiraría CastError → se corta antes con 400
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json(`El id ${id} no es válido`)
+    }
+
+    try {
+        const result = await findById(id)
+        if (result) {
+            res.status(200).json(result)
+        } else {
+            res.status(404).json(`La excursión ${id} no se encuentra`)
+        }
+    } catch (error) {
+        res.status(500).json('Error al obtener la excursión')
     }
 })
 
 // Solo las excursiones disponibles
-router.get('/disponibles', (req, res) => {
-    const result = excursionesData.filter(e => e.disponible === true)
-
-    if (result.length > 0) {
-        res.status(200).json(result)
-    } else {
-        res.status(404).json('No hay excursiones disponibles')
+router.get('/disponibles', async (req, res) => {
+    try {
+        const result = await findDisponibles()
+        if (result.length > 0) {
+            res.status(200).json(result)
+        } else {
+            res.status(404).json('No hay excursiones disponibles')
+        }
+    } catch (error) {
+        res.status(500).json('Error al obtener las excursiones')
     }
 })
 
 // Excursiones por dificultad (baja, moderada, alta)
-router.get('/byDificultad/:dificultad', (req, res) => {
+router.get('/byDificultad/:dificultad', async (req, res) => {
     const dificultad = req.params.dificultad.toLowerCase()
-    const result = excursionesData.filter(e => e.dificultad === dificultad)
 
-    if (result.length > 0) {
-        res.status(200).json(result)
-    } else {
-        res.status(404).json(`No hay excursiones de dificultad ${dificultad}`)
+    try {
+        const result = await findByDificultad(dificultad)
+        if (result.length > 0) {
+            res.status(200).json(result)
+        } else {
+            res.status(404).json(`No hay excursiones de dificultad ${dificultad}`)
+        }
+    } catch (error) {
+        res.status(500).json('Error al obtener las excursiones')
     }
 })
 
@@ -62,37 +86,41 @@ router.post('/', async (req, res) => {
     const imagen = req.body.imagen
 
     try {
-        const nuevaExcursion = {
-            id: excursionesData[excursionesData.length - 1].id + 1,
-            nombre: nombre,
-            descripcion: descripcion,
-            duracion_horas: duracion_horas,
-            precio_por_persona: precio_por_persona,
-            incluye_almuerzo: incluye_almuerzo,
-            incluye_guia: incluye_guia,
-            dificultad: dificultad,
-            disponible: true,
-            imagen: imagen
-        }
-        excursionesData.push(nuevaExcursion)
-        await writeFile('./data/excursiones.json', JSON.stringify(excursionesData, null, 2))
+        // disponible no se toma del body: toda excursión nueva arranca disponible
+        const nuevaExcursion = await create({
+            nombre, descripcion, duracion_horas, precio_por_persona,
+            incluye_almuerzo, incluye_guia, dificultad, imagen,
+            disponible: true
+        })
         res.status(200).json(nuevaExcursion)
     } catch (error) {
-        res.status(500).json('Error al crear la excursión')
+        // ValidationError: falta un campo required, dificultad fuera del enum, etc.
+        if (error.name === 'ValidationError') {
+            res.status(400).json(error.message)
+        } else {
+            res.status(500).json('Error al crear la excursión')
+        }
     }
 })
 
 // Buscar excursiones por rango de precio
-router.post('/byPrecio', (req, res) => {
+router.post('/byPrecio', async (req, res) => {
     const min = req.body.min
     const max = req.body.max
 
-    const result = excursionesData.filter(e => e.precio_por_persona >= min && e.precio_por_persona <= max)
+    if (typeof min !== 'number' || typeof max !== 'number') {
+        return res.status(400).json('min y max tienen que ser números')
+    }
 
-    if (result.length > 0) {
-        res.status(200).json(result)
-    } else {
-        res.status(404).json(`No hay excursiones entre $${min} y $${max}`)
+    try {
+        const result = await findByPrecio(min, max)
+        if (result.length > 0) {
+            res.status(200).json(result)
+        } else {
+            res.status(404).json(`No hay excursiones entre $${min} y $${max}`)
+        }
+    } catch (error) {
+        res.status(500).json('Error al buscar las excursiones')
     }
 })
 
@@ -100,20 +128,30 @@ router.post('/byPrecio', (req, res) => {
 
 // Actualizar el precio de una excursión
 router.put('/precio/update/:id', async (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     const nuevo_precio = req.body.precio_por_persona
 
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json(`El id ${id} no es válido`)
+    }
+    if (typeof nuevo_precio !== 'number') {
+        return res.status(400).json('precio_por_persona tiene que ser un número')
+    }
+
     try {
-        const index = excursionesData.findIndex(e => e.id === id)
-        if (index !== -1) {
-            excursionesData[index].precio_por_persona = nuevo_precio
-            await writeFile('./data/excursiones.json', JSON.stringify(excursionesData, null, 2))
+        const result = await updatePrecio(id, nuevo_precio)
+        if (result) {
             res.status(200).json('Precio actualizado!!')
         } else {
             res.status(404).json(`La excursión ${id} no se encuentra`)
         }
     } catch (error) {
-        res.status(500).json('Error al actualizar el precio')
+        // Ej: precio negativo (min: 0 en el Schema, se valida por runValidators)
+        if (error.name === 'ValidationError') {
+            res.status(400).json(error.message)
+        } else {
+            res.status(500).json('Error al actualizar el precio')
+        }
     }
 })
 
@@ -121,25 +159,25 @@ router.put('/precio/update/:id', async (req, res) => {
 
 // Eliminar una excursión (solo si ninguna reserva la incluye → integridad de datos)
 router.delete('/delete/:id', async (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(400).json(`El id ${id} no es válido`)
+    }
 
     try {
-        const index = excursionesData.findIndex(e => e.id === id)
-        if (index !== -1) {
-            // Leemos las reservas actuales para ver si alguna incluye esta excursión
-            const fileReservas = await readFile('./data/reservas.json', 'utf-8')
-            const reservasData = JSON.parse(fileReservas)
-            const reservasConExcursion = reservasData.filter(r => r.excursiones.find(e => e.id_excursion === id))
+        const excursion = await findById(id)
+        if (!excursion) {
+            return res.status(404).json(`La excursión ${id} no se encuentra`)
+        }
 
-            if (reservasConExcursion.length > 0) {
-                res.status(400).json(`No se puede eliminar la excursión ${id} porque está en ${reservasConExcursion.length} reserva/s.`)
-            } else {
-                excursionesData = excursionesData.filter(e => e.id !== id)
-                await writeFile('./data/excursiones.json', JSON.stringify(excursionesData, null, 2))
-                res.status(200).json(`Excursión ${id} eliminada`)
-            }
+        // Mongo no impide borrar algo referenciado: el control lo hacemos nosotros
+        const cantidadReservas = await countReservas(id)
+        if (cantidadReservas > 0) {
+            res.status(400).json(`No se puede eliminar la excursión ${id} porque está en ${cantidadReservas} reserva/s.`)
         } else {
-            res.status(404).json(`La excursión ${id} no se encuentra`)
+            await deleteById(id)
+            res.status(200).json(`Excursión ${id} eliminada`)
         }
     } catch (error) {
         res.status(500).json('Error al eliminar la excursión')
