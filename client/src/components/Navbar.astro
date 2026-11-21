@@ -50,7 +50,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '')
     const navUsuario = document.getElementById('navUsuario')
     const navCantidad = document.getElementById('navCantidad')
 
-    if (user) navUsuario.textContent = `Hola, ${user.nombre}`
+    if (user) navUsuario.textContent = `Hola, ${user.cliente.nombre}`
 
     const actualizarCantidad = () => {
         navCantidad.textContent = cantidadTotal()

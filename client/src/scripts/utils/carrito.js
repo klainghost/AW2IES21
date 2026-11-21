@@ -1,9 +1,17 @@
 // Carrito en localStorage (queda guardado aunque se cierre el navegador)
 const KEY = 'carrito'
 
+// Los ids ahora son ObjectId de Mongo (24 caracteres hexadecimales)
+const esIdValido = (id) => typeof id === 'string' && /^[0-9a-f]{24}$/i.test(id)
+
 export const getCarrito = () => {
     try {
-        return JSON.parse(localStorage.getItem(KEY)) || []
+        const carrito = JSON.parse(localStorage.getItem(KEY)) || []
+        // Limpia ítems de un carrito viejo con ids numéricos (de cuando los datos estaban en JSON):
+        // esas excursiones ya no existen con ese id
+        const limpio = carrito.filter(e => esIdValido(e.id))
+        if (limpio.length !== carrito.length) localStorage.setItem(KEY, JSON.stringify(limpio))
+        return limpio
     } catch {
         return []
     }

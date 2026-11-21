@@ -21,6 +21,15 @@ const aFecha = (valor) => {
     return typeof valor === 'string' && !isNaN(fecha) ? fecha : null
 }
 
+// Fecha de hoy (hora local del servidor) como "AAAA-MM-DD".
+// Se comparan días y no horas: "2026-12-20" se guarda como medianoche UTC, que en
+// Argentina (UTC-3) es el día anterior a las 21 h → comparando Dates, "mañana" fallaría de noche
+const hoyISO = () => {
+    const hoy = new Date()
+    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset())
+    return hoy.toISOString().slice(0, 10)
+}
+
 /* ========== GET ========== */
 
 // Todas las reservas (con nombres del cliente y de las excursiones vía populate)
@@ -93,7 +102,7 @@ router.post('/', async (req, res) => {
     if (!fecha_excursion) {
         return res.status(400).json('fecha_excursion es obligatoria y tiene que ser una fecha válida (AAAA-MM-DD)')
     }
-    if (fecha_excursion <= new Date()) {
+    if (fecha_excursion.toISOString().slice(0, 10) <= hoyISO()) {
         return res.status(400).json('La fecha de la excursión tiene que ser futura')
     }
     if (!Array.isArray(excursiones) || excursiones.length === 0) {

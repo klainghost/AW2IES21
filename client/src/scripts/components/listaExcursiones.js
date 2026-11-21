@@ -12,7 +12,8 @@ export const escucharAgregar = (contenedor, getExcursiones) => {
         const boton = e.target.closest('button[name="btnAgregar"]')
         if (!boton) return
 
-        const excursion = getExcursiones().find(x => x.id === Number(boton.dataset.id))
+        // El id es un ObjectId (string): se compara tal cual, sin Number()
+        const excursion = getExcursiones().find(x => x.id === boton.dataset.id)
         if (excursion) {
             agregarAlCarrito(excursion)
             mostrarAviso(`"${excursion.nombre}" se agregó al carrito`)

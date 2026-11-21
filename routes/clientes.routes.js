@@ -18,9 +18,10 @@ const PASSWORD_MIN = 8
 const normalizarEmail = (email) => typeof email === 'string' ? email.trim().toLowerCase() : ''
 
 /* ========== GET ========== */
+// Los GET de clientes requieren token: exponen emails y teléfonos
 
 // Todos los clientes
-router.get('/all', async (req, res) => {
+router.get('/all', auth, async (req, res) => {
     try {
         const result = await findAll()
         res.status(200).json(result)
@@ -30,7 +31,7 @@ router.get('/all', async (req, res) => {
 })
 
 // Un cliente por id
-router.get('/byId/:id', async (req, res) => {
+router.get('/byId/:id', auth, async (req, res) => {
     const id = req.params.id
 
     if (!mongoose.isValidObjectId(id)) {
@@ -50,7 +51,7 @@ router.get('/byId/:id', async (req, res) => {
 })
 
 // Clientes de una ciudad
-router.get('/byCiudad/:ciudad', async (req, res) => {
+router.get('/byCiudad/:ciudad', auth, async (req, res) => {
     const ciudad = req.params.ciudad
 
     try {

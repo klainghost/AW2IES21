@@ -1,8 +1,8 @@
 export const formatoPrecio = (numero) =>
     numero.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
 
-// "2026-11-01" → "01/11/2026"
-export const formatoFecha = (fecha) => fecha.split('-').reverse().join('/')
+// "2026-11-01" o "2026-11-01T00:00:00.000Z" (como la devuelve Mongo) → "01/11/2026"
+export const formatoFecha = (fecha) => fecha.slice(0, 10).split('-').reverse().join('/')
 
 // Fecha local en formato YYYY-MM-DD, sumando días (0 = hoy, 1 = mañana)
 export const fechaISO = (dias = 0) => {
