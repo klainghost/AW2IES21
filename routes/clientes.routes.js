@@ -2,6 +2,7 @@ import { Router } from 'express'
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { auth } from '../utils/middleware.js'
 import {
     findAll, findById, findByCiudad, findByEmail, findParaLogin,
     create, updateTelefono, countReservas, deleteById
@@ -147,8 +148,8 @@ router.post('/login', async (req, res) => {
     }
 })
 
-// Buscar un cliente por email (dato sensible: va en el body, no en la URL)
-router.post('/byEmail', async (req, res) => {
+// Buscar un cliente por email (dato sensible: va en el body, no en la URL). Requiere token
+router.post('/byEmail', auth, async (req, res) => {
     const email = normalizarEmail(req.body.email)
 
     try {
@@ -165,13 +166,17 @@ router.post('/byEmail', async (req, res) => {
 
 /* ========== PUT ========== */
 
-// Actualizar el teléfono de un cliente
-router.put('/telefono/update/:id', async (req, res) => {
+// Actualizar el teléfono de un cliente (solo el propio cliente logueado)
+router.put('/telefono/update/:id', auth, async (req, res) => {
     const id = req.params.id
     const nuevo_telefono = req.body.telefono
 
     if (!mongoose.isValidObjectId(id)) {
         return res.status(400).json(`El id ${id} no es válido`)
+    }
+    // 403: token válido, pero quiere modificar a otro cliente
+    if (id !== req.user.id) {
+        return res.status(403).json('No podés modificar los datos de otro cliente')
     }
     if (typeof nuevo_telefono !== 'string' || !nuevo_telefono.trim()) {
         return res.status(400).json('El teléfono es obligatorio')
@@ -191,12 +196,15 @@ router.put('/telefono/update/:id', async (req, res) => {
 
 /* ========== DELETE ========== */
 
-// Eliminar un cliente (solo si no tiene reservas → integridad de datos)
-router.delete('/delete/:id', async (req, res) => {
+// Eliminar un cliente (solo su propia cuenta, y solo si no tiene reservas → integridad de datos)
+router.delete('/delete/:id', auth, async (req, res) => {
     const id = req.params.id
 
     if (!mongoose.isValidObjectId(id)) {
         return res.status(400).json(`El id ${id} no es válido`)
+    }
+    if (id !== req.user.id) {
+        return res.status(403).json('No podés eliminar a otro cliente')
     }
 
     try {

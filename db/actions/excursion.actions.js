@@ -28,6 +28,18 @@ export const findById = async (id) => {
     }
 }
 
+// Varias excursiones de una sola query ($in = "el _id está en esta lista").
+// Lo usa la creación de reservas para validar todas las excursiones juntas
+export const findByIds = async (ids) => {
+    try {
+        await connectToDatabase()
+        const res = await Excursion.find({ _id: { $in: ids } })
+        return JSON.parse(JSON.stringify(res))
+    } catch (error) {
+        throw error
+    }
+}
+
 export const findDisponibles = async () => {
     try {
         await connectToDatabase()

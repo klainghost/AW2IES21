@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
+import { auth } from '../utils/middleware.js'
 import {
     findAll, findById, findDisponibles, findByDificultad, findByPrecio,
     create, updatePrecio, countReservas, deleteById
@@ -74,8 +75,8 @@ router.get('/byDificultad/:dificultad', async (req, res) => {
 
 /* ========== POST ========== */
 
-// Crear una excursión nueva
-router.post('/', async (req, res) => {
+// Crear una excursión nueva (requiere token; los GET y /byPrecio son públicos)
+router.post('/', auth, async (req, res) => {
     const nombre = req.body.nombre
     const descripcion = req.body.descripcion
     const duracion_horas = req.body.duracion_horas
@@ -127,7 +128,7 @@ router.post('/byPrecio', async (req, res) => {
 /* ========== PUT ========== */
 
 // Actualizar el precio de una excursión
-router.put('/precio/update/:id', async (req, res) => {
+router.put('/precio/update/:id', auth, async (req, res) => {
     const id = req.params.id
     const nuevo_precio = req.body.precio_por_persona
 
@@ -158,7 +159,7 @@ router.put('/precio/update/:id', async (req, res) => {
 /* ========== DELETE ========== */
 
 // Eliminar una excursión (solo si ninguna reserva la incluye → integridad de datos)
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', auth, async (req, res) => {
     const id = req.params.id
 
     if (!mongoose.isValidObjectId(id)) {
